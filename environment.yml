@@ -1,0 +1,11 @@
+name: anthracosis_quant
+channels:
+- anaconda
+- conda-forge
+dependencies:
+- scikit-image=0.25.0
+- openslide=4.0.0
+- opencv=4.11.0
+- pip=25.0.1
+- pip:
+    - openslide-python==1.4.1
