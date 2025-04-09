@@ -1,0 +1,33 @@
+#!/bin/bash
+
+if [ $# -lt 2 ]; then
+        echo "Usage: $(basename $0) <directory with images> <bounding polygon coords> <file with specific files>"
+        exit 1
+fi
+
+# Parse variables
+dir=$( readlink -f $1 )
+bounding_poly_tsv=$( readlink -f $2 )
+file_list=$3
+
+# Installation directory
+ANTHRACOSIS_QUANT_DIR=/projects/lim_lab/tlo/dev/anthracosis-quant/0.1.0
+
+# Define executables
+sbatch_qupath=${ANTHRACOSIS_QUANT_DIR}/bin/sbatch-qupath
+
+# Check if file_list provided
+if [ -z ${file_list} ]; then
+	find_files="find ${dir} -maxdepth 1 \( -type f -o -type l \) \( -name '*.svs' -o -name '*.tif' \) -print0"
+else
+	find_files="find ${dir} -maxdepth 1 \( -type f -o -type l \) \( -name '*.svs' -o -name '*.tif' \) -print0 | grep -z -Ff ${file_list}"
+fi
+
+# Launch QuPath job for each image in ${dir}
+while IFS= read -r -d '' file; do
+	mkdir -p ${file%.*}
+	cd ${file%.*}
+	ln -sf ${file}
+	sbatch ${sbatch_qupath} ${file%.*} ${bounding_poly_tsv}
+	cd ../
+done < <( eval ${find_files} )
