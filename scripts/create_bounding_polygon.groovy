@@ -2,7 +2,7 @@
 if (args.size() > 0)
     polygonFile = args[0].toString()
 else
-    bpolygonFile = Dialogs.promptForDirectory(null)
+    polygonFile = Dialogs.promptForFile(null)
 
 if (polygonFile == null)
     return
