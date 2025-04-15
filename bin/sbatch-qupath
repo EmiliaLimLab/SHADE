@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=QuPath-DFM
 #SBATCH --partition=upgrade
-#SBATCH --mem=50G
+#SBATCH --mem=350G
 #SBATCH --output=%x_%j.out
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=1
 
 if [ $# -lt 2 ]; then
 	echo "Usage: $(basename $0) <path to dir with image> <csv containing bounding polygon coordinates>"
@@ -47,6 +47,8 @@ ${QuPath} script \
 	${create_bounding_polygon_script}
 
 # Apply dual filter method
+# * currently multicore processing unavailable for pixel classification (refer to 
+#   https://forum.image.sc/t/use-multiple-cores-for-select-annotation-from-pixel-classifier/97472)
 mkdir -p ${qproj_path}/classifiers
 ln -sf ${ANTHRACOSIS_QUANT_DIR}/pixel_classifiers ${qproj_path}/classifiers/pixel_classifiers
 
