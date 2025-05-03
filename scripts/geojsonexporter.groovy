@@ -5,9 +5,12 @@ import qupath.lib.io.GsonTools
 // Get the current project
 def project = getProject()
 
-// Loop through all image entries in the project
-for (entry in project.getImageList()) {
-    // Open each image
+// Get current image entry in project
+def currentImage = getCurrentImageData().getServer().getMetadata().getName()
+def entry = project.getImageList().find { it.getImageName() == currentImage }
+
+if (entry != null) {
+    // Open image
     def imageData = entry.readImageData()
 
     // Get the image name (without the extension)
@@ -22,10 +25,8 @@ for (entry in project.getImageList()) {
     // Get the list of annotations from the image
     def annotations = imageData.getHierarchy().getAnnotationObjects()
 
-
     if (!annotations.isEmpty()) {
         // Write annotations to GeoJSON
-        //exportAnnotationsAsGeoJson(outputPath, annotations)
         exportObjectsToGeoJson(annotations, outputPath, "FEATURE_COLLECTION")
         print("Exported annotations for: " + imageName + " to " + outputPath)
     } else {

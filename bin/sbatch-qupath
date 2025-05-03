@@ -5,14 +5,14 @@
 #SBATCH --output=%x_%j.out
 #SBATCH --cpus-per-task=1
 
-if [ $# -lt 2 ]; then
-	echo "Usage: $(basename $0) <path to dir with image> <csv containing bounding polygon coordinates>"
+if [ $# -lt 1 ]; then
+	echo "Usage: $(basename $0) <path to dir with image> <tsv containing bounding polygon coordinates>"
         exit 1
 fi
 
 # Parse and define variables
-img_path=$1;shift
-bounding_poly_tsv=$1;shift
+img_path=$1
+bounding_poly_tsv=$2
 qproj_path=${img_path}/QuPathProject
 
 # Installation directories
@@ -41,10 +41,12 @@ ${QuPath} script \
 #   https://github.com/qupath/qupath/pull/634)
 # * script already saves data for each image and option seems to overwrite image
 #   hierarchies
-${QuPath} script \
-	-p ${qproj_path}/project.qpproj \
-	-a ${bounding_poly_tsv} \
-	${create_bounding_polygon_script}
+if [[ -n ${bounding_poly_tsv} ]]; then
+	${QuPath} script \
+		-p ${qproj_path}/project.qpproj \
+		-a ${bounding_poly_tsv} \
+		${create_bounding_polygon_script}
+fi
 
 # Apply dual filter method
 # * currently multicore processing unavailable for pixel classification (refer to 
@@ -65,7 +67,4 @@ ${QuPath} script \
 # Export results
 ${QuPath} script \
 	-p ${qproj_path}/project.qpproj \
-	-a ${qproj_path}/anthracosis_measurement.csv \
 	-s ${measure_exp_am_base_script}
-
-
