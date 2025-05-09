@@ -3,17 +3,25 @@
 #SBATCH --partition=upgrade
 #SBATCH --mem=350G
 #SBATCH --output=%x_%j.out
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=8
 
-if [ $# -lt 1 ]; then
-	echo "Usage: $(basename $0) <path to dir with image> <tsv containing bounding polygon coordinates>"
-        exit 1
-fi
+usage() { echo "Usage: $0 [-d <dir>] [-b <bounding_poly_tsv>] [-e]" 1>&2; exit 1; }
 
-# Parse and define variables
-img_path=$1
-bounding_poly_tsv=$2
-qproj_path=${img_path}/QuPathProject
+# Initialize variables with default values
+export_overlay=false
+
+while getopts "d:b:e" opt; do
+  case $opt in
+	d) dir="$OPTARG" ;;
+	b) bounding_poly_tsv="$OPTARG" ;;
+    e) export_overlay=true ;;
+	\?) echo "Invalid option: -$OPTARG" >&2; usage ;;
+    :) echo "Option -$OPTARG requires an argument." >&2; usage ;;
+  esac
+done
+
+# Define variables
+qproj_path=${dir}/QuPathProject
 
 # Installation directories
 QUPATH_DIR=/gsc/software/linux-x86_64-rocky9/QuPath-v0.5.1-Linux/QuPath
@@ -26,6 +34,7 @@ create_bounding_polygon_script=${ANTHRACOSIS_QUANT_DIR}/scripts/create_bounding_
 dfm_base_script=${ANTHRACOSIS_QUANT_DIR}/scripts/dfm_script.groovy
 measure_exp_am_base_script=${ANTHRACOSIS_QUANT_DIR}/scripts/measure_exp_am.groovy
 geojsonexporter_script=${ANTHRACOSIS_QUANT_DIR}/scripts/geojsonexporter.groovy
+ometiffexporter_script=${ANTHRACOSIS_QUANT_DIR}/scripts/ometiffexporter.groovy
 
 # Set environment variables
 export _JAVA_OPTIONS="-Xmx350G"
@@ -33,7 +42,7 @@ export _JAVA_OPTIONS="-Xmx350G"
 # Run
 # Create project
 ${QuPath} script \
-	-a ${img_path} \
+	-a ${dir} \
 	${create_project}
 
 # Create bounding box based on coordinates from pre-processing
@@ -68,3 +77,10 @@ ${QuPath} script \
 ${QuPath} script \
 	-p ${qproj_path}/project.qpproj \
 	-s ${measure_exp_am_base_script}
+
+# Export anthracosis annotations overlayed on slide image (OME-TIFF)
+if [ "$export_overlay" = true ]; then
+    ${QuPath} script \
+		-p ${qproj_path}/project.qpproj \
+		-s ${ometiffexporter_script}
+fi
