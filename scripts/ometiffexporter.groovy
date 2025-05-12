@@ -29,7 +29,7 @@ if (entry != null) {
     // Extract 'Positive' annotations (anthracosis) only, overlay on image, then export
     def positiveAnnotations = annotations.findAll { annotation ->
         def classification = annotation.getPathClass()
-        return classification != null && classification.getName() == "Positive"
+        return classification != null && classification.getName() == "Anthracosis"
     }
 
     if (positiveAnnotations.isEmpty()) {

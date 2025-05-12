@@ -8,8 +8,8 @@ if (classifierDir == null)
     return
 
 def tissueClassifier = classifierDir + File.separator + "tissue_detection_annotation.json"
-def darkPigmentClassifier = classifierDir + File.separator + "max_hires_t75.json"
-def heNegFilter = classifierDir + File.separator + "residual_hires_t0.17.json"
+def darkPixelClassifier = classifierDir + File.separator + "max_hires_t75.json"
+def heStainDeconvolution = classifierDir + File.separator + "residual_hires_t0.17.json"
 
 // Select bounding box to run pixel classifier on
 selectObjectsByClassification("BoundingPolygon")
@@ -23,10 +23,11 @@ if (getSelectedObjects().isEmpty()) {
 println "Detecting tumor tissue using PixelClassifier: " + tissueClassifier
 createAnnotationsFromPixelClassifier(tissueClassifier, 0.0, 0.0)
 selectObjectsByClassification("Tumor")
-addPixelClassifierMeasurements(heNegFilter, heNegFilter)
+addPixelClassifierMeasurements(heStainDeconvolution, heStainDeconvolution)
 
 // Apply dual filter to quantify anthracotic pigment
-println "Detecting anthracotic pigments using PixelClassifier: " + darkPigmentClassifier
-createAnnotationsFromPixelClassifier(darkPigmentClassifier, 0.0, 0.0)
+println "Detecting anthracotic pigments using PixelClassifier: " + darkPixelClassifier
+createAnnotationsFromPixelClassifier(darkPixelClassifier, 0.0, 0.0)
 selectObjectsByClassification("Positive")
-addPixelClassifierMeasurements(heNegFilter, heNegFilter)
+createAnnotationsFromPixelClassifier(heStainDeconvolution, 0.0, 0.0)
+addPixelClassifierMeasurements(heStainDeconvolution, heStainDeconvolution)
