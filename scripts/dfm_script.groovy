@@ -20,9 +20,9 @@ if (getSelectedObjects().isEmpty()) {
 }
 
 // Run pixel classifier to detect tissue region, then quantify
-println "Detecting tumor tissue using PixelClassifier: " + tissueClassifier
+println "Detecting tissue using PixelClassifier: " + tissueClassifier
 createAnnotationsFromPixelClassifier(tissueClassifier, 0.0, 0.0)
-selectObjectsByClassification("Tumor")
+selectObjectsByClassification("Tissue")
 addPixelClassifierMeasurements(heStainDeconvolution, heStainDeconvolution)
 
 // Apply dual filter to quantify anthracotic pigment
