@@ -25,7 +25,7 @@ qproj_path=${dir}/QuPathProject
 
 # Installation directories
 QUPATH_DIR=/gsc/software/linux-x86_64-rocky9/QuPath-v0.5.1-Linux/QuPath
-ANTHRACOSIS_QUANT_DIR=/projects/lim_lab/tlo/dev/anthracosis-quant/0.1.0
+ANTHRACOSIS_QUANT_DIR=/projects/lim_lab/tlo/dev/anthracosis-quant/0.1.1
 
 # Define executables and scripts
 QuPath=${QUPATH_DIR}/bin/QuPath
