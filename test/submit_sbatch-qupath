@@ -11,7 +11,7 @@ bounding_poly_tsv=$( readlink -f $2 )
 file_list=$3
 
 # Installation directory
-ANTHRACOSIS_QUANT_DIR=/projects/lim_lab/tlo/dev/anthracosis-quant/0.1.0
+ANTHRACOSIS_QUANT_DIR=/projects/lim_lab/tlo/dev/anthracosis-quant/0.1.1
 
 # Define executables
 sbatch_qupath=${ANTHRACOSIS_QUANT_DIR}/bin/sbatch-qupath
