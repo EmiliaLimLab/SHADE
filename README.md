@@ -1,6 +1,6 @@
 # Anthracosis quantification
 
-This repository includes scripts to perform automatic anthracotic pigment quantification from whole slide images.
+This repository includes scripts to perform automatic anthracotic pigment quantification from whole slide images using pixel classifiers.
 
 ## Installation
 
@@ -53,10 +53,33 @@ If the bounding polygon annotated in the slide image PNGs do not appear to be co
 Anthracotic pigment quantification can then be performed using QuPath. To do this, first specify the path to your QuPath and Anthracosis quantification installations (`QUPATH_DIR` and `ANTHRACOSIS_QUANT_DIR`, respectively) in the `sbatch-qupath` script, then run as follows:
 
 ```bash
-sbatch sbatch-qupath ${img_path} ${polyROI_coords_tsv}
+sbatch sbatch-qupath -d ${img_path} -b ${polyROI_coords_tsv}
 ```
 
+The `-e` option can also be provided to export anthracosis annotations (default) overlayed on slide images as OME.TIFF files. 
+
+```bash
+# Anthracosis annotations exported by default
+sbatch sbatch-qupath -d ${img_path} -b ${polyROI_coords_tsv} -e
+# Can also be passed as an argument to -e
+sbatch sbatch-qupath -d ${img_path} -b ${polyROI_coords_tsv} -e anthracosis
+
+# Similarly, tissue annotations can be exported if passed as an argument
+sbatch sbatch-qupath -d ${img_path} -b ${polyROI_coords_tsv} -e tissue
+```
+
+**Note:** Based on our experience, OME.TIFF files tend to be >10GB in size with file size scaling with amount of anthracosis.
+
 It is recommended that a helper script be used to launch the quantification SLURM script separately for each slide image. Refer to `tests/` for an example.
+
+## Output files
+
+Main output files can be found in the `QuPathProject` directory:
+* `{sample}.csv`: CSV file with measurements for each component 
+* `{sample}.geojson`: GeoJSON file containing x,y coordinates for each component
+  * If QuPath GUI is installed, the GeoJSON files can be imported, enabling interactive visualization of each component overlayed on the slide image
+* `{sample}.{anthracosis/tissue}-annotated.ome.tiff` (optional): Static OME.TIFF file with anthracosis/tissue annotations overlayed on the slide image
+  * Only output if `-e` option is provided
 
  ## Test demo
 
