@@ -5,16 +5,17 @@
 #SBATCH --output=%x_%j.out
 #SBATCH --cpus-per-task=8
 
-usage() { echo "Usage: $0 [-d <dir>] [-b <bounding_poly_tsv>] [-e]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-d <dir>] [-b <bounding_poly_tsv>] [-e] [-a <class_to_export>]" 1>&2; exit 1; }
 
 # Initialize variables with default values
 export_overlay=false
 
-while getopts "d:b:e" opt; do
+while getopts "d:b:a:e" opt; do
   case $opt in
 	d) dir="$OPTARG" ;;
 	b) bounding_poly_tsv="$OPTARG" ;;
-    e) export_overlay=true ;;
+	e) export_overlay=true ;;
+	a) export_class="$OPTARG" ;;
 	\?) echo "Invalid option: -$OPTARG" >&2; usage ;;
     :) echo "Option -$OPTARG requires an argument." >&2; usage ;;
   esac
@@ -22,6 +23,9 @@ done
 
 # Define variables
 qproj_path=${dir}/QuPathProject
+if [ -d "$qproj_path" ]; then
+	rm -r ${qproj_path}
+fi
 
 # Installation directories
 QUPATH_DIR=/gsc/software/linux-x86_64-rocky9/QuPath-v0.5.1-Linux/QuPath
@@ -80,7 +84,13 @@ ${QuPath} script \
 
 # Export anthracosis annotations overlayed on slide image (OME-TIFF)
 if [ "$export_overlay" = true ]; then
-    ${QuPath} script \
-		-p ${qproj_path}/project.qpproj \
-		-s ${ometiffexporter_script}
+	qupath_export_cmd="${QuPath} script -p ${qproj_path}/project.qpproj"
+	
+	if [[ -n ${export_class} ]]; then
+        qupath_export_cmd+=" -a ${export_class}"
+    fi
+	
+	qupath_export_cmd+=" -s ${ometiffexporter_script}"
+
+	eval ${qupath_export_cmd}
 fi

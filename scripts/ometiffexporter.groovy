@@ -7,6 +7,17 @@ import qupath.lib.gui.viewer.overlays.HierarchyOverlay
 import qupath.lib.images.writers.ImageWriter
 import qupath.lib.images.writers.ome.OMEPyramidWriter
 
+if (args.size() > 0) {
+    exportClass = args[0].toString().capitalize()  // ensure first letter is capitalized
+} else {
+    println "Classification to export annotations was not provided. Exporting 'Anthracosis' annotations by default!"
+    exportClass = "Anthracosis"
+}
+
+if (exportClass == null) {
+    exportClass = "Anthracosis"
+}
+
 // Get the current project
 def project = getProject()
 
@@ -29,22 +40,29 @@ if (entry != null) {
     // Extract 'Positive' annotations (anthracosis) only, overlay on image, then export
     def positiveAnnotations = annotations.findAll { annotation ->
         def classification = annotation.getPathClass()
-        return classification != null && classification.getName() == "Anthracosis"
+        return classification != null && classification.getName() == exportClass
     }
 
     if (positiveAnnotations.isEmpty()) {
-        println "No anthracotic pigment annotations found for: " + imageName
+        println "No " + exportClass.toLowerCase() + "annotations found for: " + imageName
     } else {
-        def outputTiff = buildFilePath(PROJECT_BASE_DIR, imageName + ".anthracosis-annotated.ome.tiff")
-        overlayAnnotations(imageData, outputTiff, positiveAnnotations)
+        def outputTiff = buildFilePath(PROJECT_BASE_DIR, imageName + "." + exportClass.toLowerCase() + "-annotated.ome.tiff")
+        overlayAnnotations(imageData, outputTiff, positiveAnnotations, exportClass)
     }
 }
 
 // Function to overlay annotations on image
-def overlayAnnotations(ImageData imageData, String outputPath, List<PathObject> annotations) {
+def overlayAnnotations(ImageData imageData, String outputPath, List<PathObject> annotations, String exportClass) {
+    // Set annotation colour depending on class
+    if (exportClass == "Anthracosis") {
+        annotationColour = [255, 255, 0]
+    } else {
+        annotationColour = [200, 0, 0]
+    }
+
     // Create temporary image data with hierarchy only containing annotations of interest (in yellow)
     def tempHierarchy = new PathObjectHierarchy()
-    annotations.each { it.setColor(255, 255, 0) }
+    annotations.each { it.setColor(annotationColour[0], annotationColour[1], annotationColour[2]) }
     tempHierarchy.addObjects(annotations)
     def tempImageData = new ImageData(imageData.getServer(), tempHierarchy)
 
