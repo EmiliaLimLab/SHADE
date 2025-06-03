@@ -1,8 +1,8 @@
 {
   "version": "0.5.1",
-  "createTimestamp": 1744214853628,
-  "modifyTimestamp": 1744214853628,
-  "uri": "file:/projects/lim_lab/tlo/dev/anthracosis-quant/0.1.0/test/JP2K-33003-1/QuPathProject/project.qpproj",
+  "createTimestamp": 1748947883701,
+  "modifyTimestamp": 1748947883701,
+  "uri": "file:/projects/lim_lab/tlo/dev/anthracosis-quant/0.1.1/test-2/JP2K-33003-1/QuPathProject/project.qpproj",
   "lastID": 1,
   "images": [
     {
@@ -11,7 +11,7 @@
         "builder": {
           "builderType": "uri",
           "providerClassName": "qupath.lib.images.servers.bioformats.BioFormatsServerBuilder",
-          "uri": "file:/projects/lim_lab/tlo/dev/anthracosis-quant/0.1.0/test/JP2K-33003-1.svs",
+          "uri": "file:/projects/lim_lab/tlo/dev/anthracosis-quant/0.1.1/test-2/JP2K-33003-1.svs",
           "args": [
             "--series",
             "0"
@@ -149,7 +149,7 @@
         }
       },
       "entryID": 1,
-      "randomizedName": "90a59d25-d5bc-461d-8137-d2640f3ffd2f",
+      "randomizedName": "9175f34c-bde0-4e9d-9959-958d51dbae4d",
       "imageName": "JP2K-33003-1.svs",
       "metadata": {}
     }

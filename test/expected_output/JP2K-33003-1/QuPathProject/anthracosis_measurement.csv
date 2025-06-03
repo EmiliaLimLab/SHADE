@@ -1,4 +1,0 @@
-Image,Object ID,Object type,Name,Classification,Parent,ROI,Centroid X µm,Centroid Y µm,/projects/lim_lab/tlo/dev/anthracosis-quant/0.1.0/test/JP2K-33003-1/QuPathProject/classifiers/pixel_classifiers/residual_hires_t0.17.json: Positive area µm^2,Area µm^2,Perimeter µm
-JP2K-33003-1.svs,21df7fd3-849a-4e7f-9079-25cf487ddc0e,Annotation,,BoundingPolygon,Root object (Image),Polygon,2119.5,2363.9,,12931749,13546.2
-JP2K-33003-1.svs,e6712100-c147-45e6-8992-947f47b361df,Annotation,,Tumor,Annotation (BoundingPolygon),Geometry,2079.8,1989.4,15022.9346,3834780,1793397.8
-JP2K-33003-1.svs,65c23eab-1557-4f0f-9d42-350cb27549ac,Annotation,,Positive,Annotation (Tumor),Geometry,2030.9,1770.5,7732.6128,9011.6,12651.3

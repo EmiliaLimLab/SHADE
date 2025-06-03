@@ -28,6 +28,6 @@ while IFS= read -r -d '' file; do
 	mkdir -p ${file%.*}
 	cd ${file%.*}
 	ln -sf ${file}
-	sbatch ${sbatch_qupath} ${file%.*} ${bounding_poly_tsv}
+	sbatch ${sbatch_qupath} -d ${file%.*} -b ${bounding_poly_tsv} -e
 	cd ../
 done < <( eval ${find_files} )

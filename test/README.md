@@ -11,7 +11,7 @@ conda activate anthracosis_quant
 Then, define a bounding polygon around the tissue for each slide image using the script `preprocess_he_otsu.py`.
 
 ```bash
-python preprocess_he_otsu.py -he . -out .
+python preprocess_he_otsu.py -he . -o .
 ```
 
 To quantify the anthracotic pigments, it is recommended to use a helper script to launch a `sbatch-qupath` job for each slide image. The script included in this directory, `submit_sbatch-qupath` can be used for this. It takes three arguments:
@@ -30,4 +30,4 @@ That's it! The output files should match those found in `expected_output/`.
 
 ## Notes
 
-Specifying 50GB of RAM, this test demo should only take a couple minutes to complete.
+Specifying 50GB of RAM, this test demo should takes 10-15 minutes to complete. This can be shortened by removing the `-e` option in `submit_sbatch-qupath` when launching `sbatch-qupath`.
