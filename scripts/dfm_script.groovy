@@ -9,7 +9,8 @@ if (classifierDir == null)
 
 def tissueClassifier = classifierDir + File.separator + "tissue_detection_annotation.json"
 def darkPixelClassifier = classifierDir + File.separator + "max_hires_t75.json"
-def heStainDeconvolution = classifierDir + File.separator + "residual_hires_t0.17.json"
+def heStainDeconvolution = classifierDir + File.separator + "residual_hires_t0.19.json"
+def bloodClassifier = classifierDir + File.separator + "blood_hires_t0.75.json"
 
 // Select bounding box to run pixel classifier on
 selectObjectsByClassification("BoundingPolygon")
@@ -31,3 +32,4 @@ createAnnotationsFromPixelClassifier(darkPixelClassifier, 0.0, 0.0)
 selectObjectsByClassification("Positive")
 createAnnotationsFromPixelClassifier(heStainDeconvolution, 0.0, 0.0)
 addPixelClassifierMeasurements(heStainDeconvolution, heStainDeconvolution)
+addPixelClassifierMeasurements(bloodClassifier, bloodClassifier)
