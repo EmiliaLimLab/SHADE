@@ -8,14 +8,23 @@ import qupath.lib.images.writers.ImageWriter
 import qupath.lib.images.writers.ome.OMEPyramidWriter
 
 if (args.size() > 0) {
-    exportClass = args[0].toString().capitalize()  // ensure first letter is capitalized
+    // Split comma-separated string (if applicable) and clean up each class name
+    exportClasses = args[0].toString().split(',').collect { className ->
+        className.trim().capitalize()  // remove whitespace and ensure first letter is capitalized
+    }
 } else {
     println "Classification to export annotations was not provided. Exporting 'Anthracosis' annotations by default!"
-    exportClass = "Anthracosis"
+    exportClasses = ["Anthracosis"]
 }
 
-if (exportClass == null) {
-    exportClass = "Anthracosis"
+if (exportClasses == null) {
+    exportClasses = ["Anthracosis"]
+}
+
+// Check validity of provided exportClasses
+def validClasses = ["Tissue", "Positive", "Anthracosis", "Other"]
+if (!exportClasses.every { it in validClasses }) {
+    throw new IllegalArgumentException("At least one classification provided does not exist. Supported classifications include: " + validClasses.collect { it.toLowerCase() }.join(", "))
 }
 
 // Get the current project
@@ -37,32 +46,38 @@ if (entry != null) {
         println "No annotations found for: " + imageName
     }
 
-    // Extract 'Positive' annotations (anthracosis) only, overlay on image, then export
-    def positiveAnnotations = annotations.findAll { annotation ->
+    // Extract specified annotations only, overlay on image, then export
+    def specifiedAnnotations = annotations.findAll { annotation ->
         def classification = annotation.getPathClass()
-        return classification != null && classification.getName() == exportClass
+        return classification != null && classification.getName() in exportClasses
     }
 
-    if (positiveAnnotations.isEmpty()) {
-        println "No " + exportClass.toLowerCase() + "annotations found for: " + imageName
+    if (specifiedAnnotations.isEmpty()) {
+        println "No " + exportClasses.collect { it.toLowerCase() }.join(", ") + "annotations found for: " + imageName
     } else {
-        def outputTiff = buildFilePath(PROJECT_BASE_DIR, imageName + "." + exportClass.toLowerCase() + "-annotated.ome.tiff")
-        overlayAnnotations(imageData, outputTiff, positiveAnnotations, exportClass)
+        def outputTiff = buildFilePath(PROJECT_BASE_DIR, imageName + "." + exportClasses.collect { it.toLowerCase() }.join("-") + "-annotated.ome.tiff")
+        overlayAnnotations(imageData, outputTiff, specifiedAnnotations, exportClasses)
     }
 }
 
 // Function to overlay annotations on image
-def overlayAnnotations(ImageData imageData, String outputPath, List<PathObject> annotations, String exportClass) {
+def overlayAnnotations(ImageData imageData, String outputPath, List<PathObject> annotations, List<String> exportClasses) {
     // Set annotation colour depending on class
-    if (exportClass == "Anthracosis") {
-        annotationColour = [255, 255, 0]
-    } else {
-        annotationColour = [200, 0, 0]
+    annotationColourMap = [:]
+    exportClasses.each { className ->
+        if (className == "Anthracosis") {
+            annotationColourMap[className] = [255, 255, 0]
+        } else {
+            annotationColourMap[className] = [200, 0, 0]
+        }
     }
 
     // Create temporary image data with hierarchy only containing annotations of interest (in yellow)
     def tempHierarchy = new PathObjectHierarchy()
-    annotations.each { it.setColor(annotationColour[0], annotationColour[1], annotationColour[2]) }
+    annotations.each {
+        def annotationColour = annotationColourMap[it.getPathClass()?.getName()]
+        it.setColor(annotationColour[0], annotationColour[1], annotationColour[2])
+    }
     tempHierarchy.addObjects(annotations)
     def tempImageData = new ImageData(imageData.getServer(), tempHierarchy)
 

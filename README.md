@@ -68,6 +68,12 @@ sbatch sbatch-qupath -d ${img_path} -b ${polyROI_coords_tsv} -e anthracosis
 sbatch sbatch-qupath -d ${img_path} -b ${polyROI_coords_tsv} -e tissue
 ```
 
+Several annotation types can be provided as input. This will export all specified annotations overlayed as a single OME.TIFF file.
+
+```bash
+sbatch sbatch-qupath -d ${img_path} -b ${polyROI_coords_tsv} -e anthracosis,tissue
+```
+
 **Note:** Based on our experience, OME.TIFF files tend to be >10GB in size with file size scaling with amount of anthracosis.
 
 It is recommended that a helper script be used to launch the quantification SLURM script separately for each slide image. Refer to `tests/` for an example.
@@ -78,7 +84,7 @@ Main output files can be found in the `QuPathProject` directory:
 * `{sample}.csv`: CSV file with measurements for each component 
 * `{sample}.geojson`: GeoJSON file containing x,y coordinates for each component
   * If QuPath GUI is installed, the GeoJSON files can be imported, enabling interactive visualization of each component overlayed on the slide image
-* `{sample}.{anthracosis/tissue}-annotated.ome.tiff` (optional): Static OME.TIFF file with anthracosis/tissue annotations overlayed on the slide image
+* `{sample}.{anthracosis/tissue/positive/other}-annotated.ome.tiff` (optional): Static OME.TIFF file with anthracosis, tissue, positive and/or other annotations overlayed on the slide image
   * Only output if `-e` option is provided
 
  ## Test demo
