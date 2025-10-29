@@ -28,8 +28,8 @@ if [ -d "$qproj_path" ]; then
 fi
 
 # Installation directories
-QUPATH_DIR=/gsc/software/linux-x86_64-rocky9/QuPath-v0.5.1-Linux/QuPath
-ANTHRACOSIS_QUANT_DIR=/projects/lim_lab/tlo/dev/anthracosis-quant/anthracosis_quant
+QUPATH_DIR=/path/to/local/QuPath/installation
+ANTHRACOSIS_QUANT_DIR=/path/to/SHADE/folder
 
 # Define executables and scripts
 QuPath=${QUPATH_DIR}/bin/QuPath
