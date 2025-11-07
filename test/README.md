@@ -1,6 +1,6 @@
 # Test demo
 
-Example slide image was obtained from the OpenSlide data repository: https://openslide.cs.cmu.edu/download/openslide-testdata/Aperio/.
+Example slide image was obtained from the NCI Genomic Data Commons TCGA: https://portal.gdc.cancer.gov/cases/9240d5fc-de23-4436-8099-da9bd3054860.
 
 To run the demo, first activate your conda environment:
 
