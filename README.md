@@ -1,4 +1,4 @@
-# Anthracosis quantification
+# SHADE - Slide-based methods for High Throughput Anthracosis Detection & Estimation
 
 This repository includes scripts to perform automatic anthracotic pigment quantification from whole slide images using pixel classifiers.
 
