@@ -35,7 +35,7 @@ conda env create --file=environment.yml
 There are two main scripts included in this repo, both of which can be found in `bin/`:
 
 * `preprocess_he_otsu.py`: outputs bounding polygon coordinates around tissue region
-  * **Note:** this script can only be run on slide images in SVS format
+  * **Note:** this script can only be run on slide images in SVS or NDPI format
 * `sbatch-qupath`: SLURM script for performing anthracotic pigment quantification
 
 ### Step-by-step guide
