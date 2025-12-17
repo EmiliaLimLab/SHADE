@@ -23,6 +23,9 @@ conda env create --file=environment.yml
   * openslide-python (tested with v1.4.1)
   * pillow (tested with v11.1.0)
   * scikit-image (tested with v0.25.0)
+  * pathlib (tested with v1.0.1)
+  * libvorbis (tested with v1.3.7)
+  * ffmpeg (tested with v7.1.1)
 
 
 ## Running anthracosis quantification
