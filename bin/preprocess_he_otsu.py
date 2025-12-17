@@ -6,6 +6,7 @@ import numpy as np
 import openslide
 from PIL import ImageDraw
 import cv2
+from pathlib import Path
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts'))
 from h_and_e_otsu_thresholding import he_otsu
@@ -15,7 +16,7 @@ class HESlide:
     def __init__(self, file_path=None, openslide_obj=None):
         if openslide_obj:
             self.file_path = file_path
-            self.image_name = os.path.basename(file_path).removesuffix('.svs')
+            self.image_name = Path(file_path).stem
             self.openslide_obj = openslide_obj
         else:
             sys.stderr.write(
@@ -32,7 +33,7 @@ def load_slides(he_path):
     all_slides = []
     not_supported_ext = ['.ome.tif', '.ome.tiff', '.tif', '.tiff']
     for file in os.listdir(he_path):
-        if file.endswith('.svs'):
+        if file.endswith(('.svs', '.ndpi')):
             file_path = os.path.join(he_path, file)
             openslide_obj = openslide.OpenSlide(file_path)
             all_slides.append(HESlide(file_path, openslide_obj))
