@@ -11,7 +11,7 @@ def entry = project.getImageList().find { it.getImageName() == currentImage }
 
 if (entry != null) {
     def imageName = entry.getImageName().replaceFirst(/\.[^.]+/, "")
-    def outputFile = new File(buildFilePath(PROJECT_BASE_DIR, imageName + "anth_anno.csv"))
+    def outputFile = new File(buildFilePath(PROJECT_BASE_DIR, imageName + "_anth_anno.csv"))
 
     // Export measurements with a filter
     def exporter = new MeasurementExporter()
