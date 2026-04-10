@@ -91,7 +91,8 @@ It is recommended that a helper script be used to launch the quantification SLUR
 ## Output files
 
 Main output files can be found in the `QuPathProject` directory:
-* `{sample}.csv`: CSV file with measurements for each component 
+* `{sample}.csv`: CSV file with measurements for each component
+* `{sample}_anth_anno.csv`: CSV file containing measurements for individual regions of detected anthracosis 
 * `{sample}.geojson`: GeoJSON file containing x,y coordinates for each component
   * If QuPath GUI is installed, the GeoJSON files can be imported, enabling interactive visualization of each component overlayed on the slide image
 * `{sample}.{anthracosis/tissue/positive/other}-annotated.ome.tiff` (optional): Static OME.TIFF file with anthracosis, tissue, positive and/or other annotations overlayed on the slide image
