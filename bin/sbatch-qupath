@@ -39,6 +39,8 @@ dfm_base_script=${ANTHRACOSIS_QUANT_DIR}/scripts/dfm_script.groovy
 measure_exp_am_base_script=${ANTHRACOSIS_QUANT_DIR}/scripts/measure_exp_am.groovy
 geojsonexporter_script=${ANTHRACOSIS_QUANT_DIR}/scripts/geojsonexporter.groovy
 ometiffexporter_script=${ANTHRACOSIS_QUANT_DIR}/scripts/ometiffexporter.groovy
+split_anth_anno=${ANTHRACOSIS_QUANT_DIR}/scripts/split_anno.groovy
+meaure_exp_anth=${ANTHRACOSIS_QUANT_DIR}/scripts/exp_anth.groovy
 
 # Set environment variables
 export _JAVA_OPTIONS="-Xmx350G"
@@ -94,3 +96,13 @@ if [ "$export_overlay" = true ]; then
 
 	eval ${qupath_export_cmd}
 fi
+
+# Split anthracosis annotations into individual regions
+${QuPath} script \
+	-p ${qproj_path}/project.qpproj \
+	-s ${split_anth_anno}
+
+# Export measurements of individual anthracotic regions
+${QuPath} script \
+	-p ${qproj_path}/project.qpproj \
+	-s ${measure_exp_anth}
