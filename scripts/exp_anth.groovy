@@ -1,13 +1,10 @@
-import qupath.lib.gui.scripting.QPEx
 import qupath.lib.gui.tools.MeasurementExporter
 import qupath.lib.objects.PathAnnotationObject
 
-def targetClass = "Anthracosis" 
+def targetClass = args.length > 0 ? args[0] : "Anthracosis"
 // -------------------------------------
 
-def project = getProject()
-def currentImage = getCurrentImageData().getServer().getMetadata().getName()
-def entry = project.getImageList().find { it.getImageName() == currentImage }
+def entry = getProjectEntry()
 
 if (entry != null) {
     def imageName = entry.getImageName().replaceFirst(/\.[^.]+/, "")
@@ -18,8 +15,11 @@ if (entry != null) {
         .imageList([entry])
         .separator(',')
         .exportType(PathAnnotationObject.class)
-        .filter(obj -> obj.getPathClass() == getPathClass("Anthracosis"))
+        .filter(obj -> obj.getPathClass() == getPathClass(targetClass))
         .exportMeasurements(outputFile)
 
     println "Export complete! Saved only '${targetClass}' measurements to: ${outputFile}"
+}
+else {
+    println "Error: could not find project entry"
 }
