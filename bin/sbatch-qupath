@@ -100,9 +100,11 @@ fi
 # Split anthracosis annotations into individual regions
 ${QuPath} script \
 	-p ${qproj_path}/project.qpproj \
+	-a "${export_class:-Anthracosis}" \
 	-s ${split_anth_anno}
 
 # Export measurements of individual anthracotic regions
 ${QuPath} script \
 	-p ${qproj_path}/project.qpproj \
+	-a "${export_class:-Anthracosis}" \
 	-s ${measure_exp_anth}
