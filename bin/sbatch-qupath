@@ -95,6 +95,14 @@ if [ "$export_overlay" = true ]; then
 	qupath_export_cmd+=" -s ${ometiffexporter_script}"
 
 	eval ${qupath_export_cmd}
+
+	#Run tiff_to_jpeg_process.py
+	tiff_script_path="${ANTHRACOSIS_QUANT_DIR}/scripts/tiff_to_jpeg_process.py"
+	if [ -f "${tiff_script_path}" ]; then
+		python3 "${tiff_script_path}" -i "${qproj_path} || echo "tiff_to_jpeg_process.py failed" >&2
+	else	
+		echo "Warning: tiff_to_jpeg_process.py not found at ${tiff_script_path}, skipping TIFF -> JPEG conversion" >&2
+	fi	
 fi
 
 # Split anthracosis annotations into individual regions
