@@ -15,7 +15,7 @@ if (entry != null) {
     def imageName = entry.getImageName().replaceFirst(/\.[^.]+/, "")
 
     // Define output filename
-    def outputFile = new File(buildFilePath(PROJECT_BASE_DIR, imageName + ".csv"))
+    def outputFile = new File(buildFilePath(PROJECT_BASE_DIR, imageName + "_raw.csv"))
 
     // Export measurements
     def exportType = PathAnnotationObject.class
