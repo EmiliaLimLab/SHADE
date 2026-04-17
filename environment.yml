@@ -9,3 +9,4 @@ dependencies:
 - pip=25.0.1
 - pip:
     - openslide-python==1.4.1
+    - imagecodecs==2026.3.6
