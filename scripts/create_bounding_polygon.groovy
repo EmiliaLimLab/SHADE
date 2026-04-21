@@ -46,6 +46,26 @@ for (entry in project.getImageList()) {
         bounding_poly.setPathClass(getPathClass("BoundingPolygon"))
         hierarchy.addObject(bounding_poly)
         entry.saveImageData(imageData)
+
+        // Take snapshot after bounding polygon is created and saved
+        try {
+            // Open the image in viewer to capture the snapshot
+            def viewer = getBatchProjectData(imageData)
+            
+            // Get the viewer snapshot
+            def img = GuiTools.makeViewerSnapshot()
+            
+            // Create snapshots directory if it doesn't exist
+            def snapshotDir = new File("${qproj_path}/bounding_polygon_snapshots")
+            snapshotDir.mkdirs()
+            
+            // Save the snapshot with image name
+            def outputPath = "${snapshotDir}/${imageName}_bounding_polygon.png"
+            writeImage(img, outputPath)
+            println "Snapshot saved: ${outputPath}"
+        } catch (Exception e) {
+            println "Warning: Could not save snapshot for ${imageName}: ${e.getMessage()}"
+        }
     }
 }
 
