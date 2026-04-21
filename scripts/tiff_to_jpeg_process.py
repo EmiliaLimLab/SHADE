@@ -26,11 +26,12 @@ def find_tiff_files(path, recursive=True):
     If path is a file, return [path]. If path is a directory, search it
     (recursively by default) for .tiff/.ome.tiff files.
     """
-    exts = ('.tiff', '.tif', '.ome.tiff', '.ome.tif')
+    ome_exts = ('.ome.tiff', '.ome.tif')
+    all_exts = ('.tiff', '.tif', '.ome.tiff', '.ome.tif')
     path = os.path.abspath(path)
 
     if os.path.isfile(path):
-        if path.lower().endswith(exts):
+        if path.lower().endswith(all_exts):
             return [path]
         return []
 
@@ -38,11 +39,11 @@ def find_tiff_files(path, recursive=True):
     if recursive:
         for root, _, files in os.walk(path):
             for f in files:
-                if f.lower().endswith(exts):
+                if f.lower().endswith(ome_exts):
                     matches.append(os.path.join(root, f))
     else:
         for f in os.listdir(path):
-            if f.lower().endswith(exts):
+            if f.lower().endswith(ome_exts):
                 matches.append(os.path.join(path, f))
 
     return matches
