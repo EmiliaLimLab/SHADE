@@ -12,11 +12,11 @@ export_overlay=false
 
 while getopts "d:b:a:e" opt; do
   case $opt in
-	d) dir="$OPTARG" ;;
-	b) bounding_poly_tsv="$OPTARG" ;;
-	e) export_overlay=true ;;
-	a) export_class="$OPTARG" ;;
-	\?) echo "Invalid option: -$OPTARG" >&2; usage ;;
+  d) dir="$OPTARG" ;;
+  b) bounding_poly_tsv="$OPTARG" ;;
+  e) export_overlay=true ;;
+  a) export_class="$OPTARG" ;;
+  \?) echo "Invalid option: -$OPTARG" >&2; usage ;;
     :) echo "Option -$OPTARG requires an argument." >&2; usage ;;
   esac
 done
@@ -24,7 +24,7 @@ done
 # Define variables
 qproj_path=${dir}/QuPathProject
 if [ -d "$qproj_path" ]; then
-	rm -r ${qproj_path}
+  rm -r ${qproj_path}
 fi
 
 # Installation directories
@@ -32,7 +32,7 @@ QUPATH_DIR=/path/to/local/QuPath/installation
 ANTHRACOSIS_QUANT_DIR=/path/to/SHADE/folder
 
 # Define executables and scripts
-QuPath=${QUPATH_DIR}/bin/QuPath
+QuPath=${QUPATH_DIR} #/bin/QuPath
 create_project=${ANTHRACOSIS_QUANT_DIR}/scripts/create_project.groovy
 create_bounding_polygon_script=${ANTHRACOSIS_QUANT_DIR}/scripts/create_bounding_polygon.groovy
 dfm_base_script=${ANTHRACOSIS_QUANT_DIR}/scripts/dfm_script.groovy
@@ -40,7 +40,7 @@ measure_exp_am_base_script=${ANTHRACOSIS_QUANT_DIR}/scripts/measure_exp_am.groov
 geojsonexporter_script=${ANTHRACOSIS_QUANT_DIR}/scripts/geojsonexporter.groovy
 ometiffexporter_script=${ANTHRACOSIS_QUANT_DIR}/scripts/ometiffexporter.groovy
 split_anth_anno=${ANTHRACOSIS_QUANT_DIR}/scripts/split_anno.groovy
-meaure_exp_anth=${ANTHRACOSIS_QUANT_DIR}/scripts/exp_anth.groovy
+measure_exp_anth=${ANTHRACOSIS_QUANT_DIR}/scripts/exp_anth.groovy
 
 # Set environment variables
 export _JAVA_OPTIONS="-Xmx350G"
@@ -48,19 +48,19 @@ export _JAVA_OPTIONS="-Xmx350G"
 # Run
 # Create project
 ${QuPath} script \
-	-a ${dir} \
-	${create_project}
+  -a ${dir} \
+  ${create_project}
 
 # Create bounding box based on coordinates from pre-processing
-# * do not run with -s, --save option (refer to 
+#  * do not run with -s, --save option (refer to 
 #   https://github.com/qupath/qupath/pull/634)
 # * script already saves data for each image and option seems to overwrite image
 #   hierarchies
 if [[ -n ${bounding_poly_tsv} ]]; then
-	${QuPath} script \
-		-p ${qproj_path}/project.qpproj \
-		-a ${bounding_poly_tsv} \
-		${create_bounding_polygon_script}
+  ${QuPath} script \
+	-p ${qproj_path}/project.qpproj \
+	-a ${bounding_poly_tsv} \
+	-s ${create_bounding_polygon_script}
 fi
 
 # Apply dual filter method
@@ -70,54 +70,59 @@ mkdir -p ${qproj_path}/classifiers
 ln -sf ${ANTHRACOSIS_QUANT_DIR}/pixel_classifiers ${qproj_path}/classifiers/pixel_classifiers
 
 ${QuPath} script \
-	-p ${qproj_path}/project.qpproj \
-	-a ${qproj_path}/classifiers/pixel_classifiers \
-	-s ${dfm_base_script}
+  -p ${qproj_path}/project.qpproj \
+  -a ${qproj_path}/classifiers/pixel_classifiers \
+  -s ${dfm_base_script}
 
 # Export annotations
 ${QuPath} script \
-	-p ${qproj_path}/project.qpproj \
-	-s ${geojsonexporter_script}
+  -p ${qproj_path}/project.qpproj \
+  -s ${geojsonexporter_script}
 
 # Export results
 ${QuPath} script \
-	-p ${qproj_path}/project.qpproj \
-	-s ${measure_exp_am_base_script}
+  -p ${qproj_path}/project.qpproj \
+  -s ${measure_exp_am_base_script}
 
 # Export anthracosis annotations overlayed on slide image (OME-TIFF)
 if [ "$export_overlay" = true ]; then
-	qupath_export_cmd="${QuPath} script -p ${qproj_path}/project.qpproj"
-	
-	if [[ -n ${export_class} ]]; then
+  qupath_export_cmd="${QuPath} script -p ${qproj_path}/project.qpproj"
+
+  if [[ -n ${export_class} ]]; then
         qupath_export_cmd+=" -a ${export_class}"
     fi
-	
-	qupath_export_cmd+=" -s ${ometiffexporter_script}"
 
-	eval ${qupath_export_cmd}
+  qupath_export_cmd+=" -s ${ometiffexporter_script}"
 
-	#Run tiff_to_jpeg_process.py
-	tiff_script_path="${ANTHRACOSIS_QUANT_DIR}/scripts/tiff_to_jpeg_process.py"
-	if [ -f "${tiff_script_path}" ]; then
-			"${PYTHON}" "${tiff_script_path}" \
-			-i "${qproj_path}" --no-recursive || echo "tiff_to_jpeg_process.py failed" >&2
-	else	
-		echo "Warning: tiff_to_jpeg_process.py not found at ${tiff_script_path}, skipping TIFF -> JPEG conversion" >&2
-	fi	
+  eval ${qupath_export_cmd}
+
+  # Set Python interpreter (conda env with required packages)
+  PYTHON=/opt/miniconda3/envs/anthracosis_quant/bin/python3
+
+  #Run tiff_to_jpeg_process.py
+  tiff_script_path="${ANTHRACOSIS_QUANT_DIR}/scripts/tiff_to_jpeg_process.py"
+  if [ -f "${tiff_script_path}" ]; then
+    "${PYTHON}" "${tiff_script_path}" \
+	-i "${qproj_path}" --no-recursive || echo "tiff_to_jpeg_process.py failed" >&2
+  else
+	echo "Warning: tiff_to_jpeg_process.py not found at ${tiff_script_path}, skipping TIFF -> JPEG conversion" >&2
+  fi
 fi
 
 # Split anthracosis annotations into individual regions
 ${QuPath} script \
-	-p ${qproj_path}/project.qpproj \
-	-a "${export_class:-Anthracosis}" \
-	-s ${split_anth_anno}
+  -p ${qproj_path}/project.qpproj \
+  -a "${export_class:-Anthracosis}" \
+  -s ${split_anth_anno}
 
 # Export measurements of individual anthracotic regions
 ${QuPath} script \
-	-p ${qproj_path}/project.qpproj \
-	-a "${export_class:-Anthracosis}" \
-	-s ${measure_exp_anth}
+  -p ${qproj_path}/project.qpproj \
+  -a "${export_class:-Anthracosis}" \
+  -s ${measure_exp_anth}
 
 #Render SHADE R Markdown
 export QPROJ_PATH="${qproj_path}"
-Rscript -e "rmarkdown::render('${ANTHRACOSIS_QUANT_DIR}/scripts/SHADE_output.Rmd', params = list(qproj_path = Sys.getenv('QPROJ_PATH')), envir = new.env())"
+Rscript -e "rmarkdown::render('${ANTHRACOSIS_QUANT_DIR}/scripts/SHADE_output.Rmd', 
+params = list(qproj_path = Sys.getenv('QPROJ_PATH')), 
+output_dir = Sys.getenv('QPROJ_PATH'), envir = new.env())"
