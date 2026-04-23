@@ -1,0 +1,137 @@
+---
+title: "SHADE_output"
+output: 
+  html_document:
+    code_folding: hide
+    df_print: paged
+date: "2026-04-14"
+params:
+  qproj_path: NULL
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+### Loading Packages
+library(data.table); library(tidyr); library(ggplot2); library(ggpubr)
+library(dplyr); library(stringr); library(gtsummary); library(shiny)
+
+# Resolve project path: prefer params, fallback to env var QPROJ_PATH, then cwd
+qproj <- NULL
+if (!is.null(params$qproj_path) && params$qproj_path != "") {
+  qproj <- params$qproj_path
+} else if (Sys.getenv("QPROJ_PATH", "") != "") {
+  qproj <- Sys.getenv("QPROJ_PATH")
+} else {
+  qproj <- getwd()
+}
+qproj <- normalizePath(qproj, mustWork = FALSE)
+message("Using project path: ", qproj)
+```
+
+```{r, include=FALSE}
+##Reading Input Files:
+
+# Find the first matching SHADE raw CSV (adjust pattern if needed)
+shade_files <- list.files(path = qproj, pattern = "_raw\\.csv$", recursive = TRUE, full.names = TRUE, ignore.case = TRUE)
+if (length(shade_files) == 0) stop("No SHADE CSV found under: ", qproj)
+shade_raw <- read.csv(shade_files[1])
+
+# Find anthracotic annotation CSVs
+anno_files <- list.files(path = qproj, pattern = "_anth_anno\\.csv$", recursive = TRUE, full.names = TRUE, ignore.case = TRUE)
+if (length(anno_files) == 0) stop("No anthracosis annotation CSV found under: ", qproj)
+anth_anno <- read.csv(anno_files[1])
+```
+
+## Anthracosis detection overlay image
+```{r, side-by-side, fig.show="hold", out.width="45%", fig.cap=c("Before SHADE", "After SHADE")}
+# search for before/after images (adjust patterns if necessary)
+before_img <- list.files(path = qproj, pattern = "_downsampled.*\\.jpg$", recursive = TRUE, full.names = TRUE, ignore.case = TRUE)[1]
+after_img  <- list.files(path = qproj, pattern = "enhanced.*\\.png$", recursive = TRUE, full.names = TRUE, ignore.case = TRUE)[1]
+```
+
+| Original H&E | Original H&E with SHADE Annotations |
+| :---: | :---: |
+| ![](`r before_img`) | ![](`r after_img`) |
+
+```{r}
+## Generating SHADE score
+shade_raw_anth = shade_raw %>% 
+  filter(Classification =="Anthracosis")
+
+area_anth = shade_raw_anth %>%
+  mutate(Difference = Area.µm.2 - pick(ends_with("Other.area.µm.2"))[[1]])
+
+tissue_area = shade_raw %>%
+  filter(Classification =="Tissue")
+
+data_ss = shade_raw_anth %>%
+  select(Image)%>%
+  mutate(shade_score = (area_anth$Difference / tissue_area$Area.µm.2) *100)
+```
+
+```{r}
+knitr::kable(data_ss,
+             caption = "SHADE Score")
+```
+
+## Anthracotic annotation histogram
+```{r}
+max_area <- max(anth_anno$Area.µm.2, na.rm = TRUE)
+
+my_breaks = sort(unique(c(0.1, 2, 10, 100, 1000, max_area)))
+
+anth_histo <- ggplot(anth_anno %>% 
+         mutate(Temp_Bin = cut(Area.µm.2, breaks = my_breaks, include.lowest = TRUE)), 
+       aes(x = Temp_Bin)) +
+  geom_bar(fill = "steelblue", colour = "white") +
+  scale_y_log10() +
+  labs(title = "Distribution of Anthracotic Areas",
+       x = "Area Range (µm²)",
+       y = "Count (Log10)")
+```
+
+```{r}
+plot(anth_histo)
+```
+
+```{r}
+##SPECK SHADE Score
+speck =  anth_anno %>%
+  filter(Area.µm.2 <= 10) %>%
+  summarise(speck_area = sum(Area.µm.2))
+
+speck_ss = speck %>%
+  mutate(speck_score = (speck / tissue_area$Area.µm.2) *100)
+
+knitr::kable(speck_ss,
+             caption = "SPECK SHADE Score")
+```
+
+```{r}
+##CONF SHADE Score
+conf =  anth_anno %>%
+  filter(Area.µm.2 > 10) %>%
+  summarise(conf_area = sum(Area.µm.2))
+
+conf_ss = conf %>%
+  mutate(conf_score = (conf / tissue_area$Area.µm.2) *100)
+
+knitr::kable(conf_ss,
+             caption = "CONFLUENT SHADE Score")
+
+```
+
+## Summary of anthracotic annotations
+```{r}
+summary(anth_anno)
+```
+
+## Table of anthracotic annotations
+```{r}
+##Remove unneccessary columns: Image, object type, name, parent
+anth_anno %>%
+  select(Object.ID, Classification, Centroid.X.µm, Centroid.Y.µm, Area.µm.2, Perimeter.µm)
+```
