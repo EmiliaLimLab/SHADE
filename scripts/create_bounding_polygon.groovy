@@ -1,3 +1,14 @@
+import java.awt.image.BufferedImage
+import java.awt.Graphics2D
+import java.awt.Color
+import java.awt.BasicStroke
+import java.awt.Polygon
+import javax.imageio.ImageIO
+import qupath.lib.gui.commands.ProjectCommands
+import qupath.fx.dialogs.Dialogs
+import qupath.lib.gui.tools.GuiTools
+import qupath.lib.regions.RegionRequest
+
 // Parse provided args for polygonFile
 if (args.size() > 0)
     polygonFile = args[0].toString()
@@ -12,7 +23,7 @@ println "Parsing polygon coordinates from ${polygonFile} and adding polygon anno
 // Parse all lines in polygonFile
 def polygonMap = [:]
 new File(polygonFile).eachLine { line, lineNumber ->
-    if (lineNumber > 1) {  // Check that current line is not the header
+    if (lineNumber > 1) {
         def fields = line.split(/\t/)
         if (fields.size() >= 3) {
             def imagePath = fields[0].toString()
@@ -20,51 +31,53 @@ new File(polygonFile).eachLine { line, lineNumber ->
                 xcoords: fields[1].split(',').collect { it.toDouble() } as double[],
                 ycoords: fields[2].split(',').collect { it.toDouble() } as double[]
             ]
-        polygonMap[imagePath] = polygonData
+            polygonMap[imagePath] = polygonData
         }
     }
 }
 
 // Get the current project
 def project = getProject()
+def projectDir = project.getPath().toFile().getParentFile()
 
 // Loop through all image entries in the project
 for (entry in project.getImageList()) {
-    // Extract bounding polygon coordinates from polygonMap
     def imageName = entry.getImageName()
     def matchingKey = polygonMap.keySet().find { key ->
-        key =~ /${imageName}/
+        new File(key).getName().equalsIgnoreCase(new File(imageName).getName()) ||
+        key.toLowerCase().contains(imageName.toLowerCase())
     }
 
-    // Create bounding box if imageName is found in polygonMap keys
     if (matchingKey) {
         def polygonData = polygonMap[matchingKey]
         def imageData = entry.readImageData()
         def hierarchy = imageData.getHierarchy()
+
+        // Create and save the annotation
         def roi = ROIs.createPolygonROI(polygonData.xcoords, polygonData.ycoords, ImagePlane.getDefaultPlane())
         def bounding_poly = PathObjects.createAnnotationObject(roi)
         bounding_poly.setPathClass(getPathClass("BoundingPolygon"))
         hierarchy.addObject(bounding_poly)
         entry.saveImageData(imageData)
 
-        // Take snapshot after bounding polygon is created and saved
+        // Save downsampled image
+        def snapshotDir = new File(projectDir, "downsampled_snapshots")
+        snapshotDir.mkdirs()
+
         try {
-            // Open the image in viewer to capture the snapshot
-            def viewer = getBatchProjectData(imageData)
-            
-            // Get the viewer snapshot
-            def img = GuiTools.makeViewerSnapshot()
-            
-            // Create snapshots directory if it doesn't exist
-            def snapshotDir = new File("${qproj_path}/bounding_polygon_snapshots")
-            snapshotDir.mkdirs()
-            
-            // Save the snapshot with image name
-            def outputPath = "${snapshotDir}/${imageName}_bounding_polygon.png"
-            writeImage(img, outputPath)
-            println "Snapshot saved: ${outputPath}"
+            def server = imageData.getServer()
+            def request = RegionRequest.createInstance(
+                server.getPath(),
+                10,                  // downsample factor
+                0, 0,
+                server.getWidth(),
+                server.getHeight()
+            )
+            def outputPath = new File(snapshotDir, "${imageName}_downsampled.jpg").toString()
+            writeImageRegion(server, request, outputPath)
+            println "Downsampled image saved: ${outputPath}"
         } catch (Exception e) {
-            println "Warning: Could not save snapshot for ${imageName}: ${e.getMessage()}"
+            println "Warning: Could not save downsampled image for ${imageName}: ${e.getMessage()}"
         }
     }
 }
