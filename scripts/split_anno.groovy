@@ -1,85 +1,16 @@
-import java.awt.image.BufferedImage
-import java.awt.Graphics2D
-import java.awt.Color
-import java.awt.BasicStroke
-import java.awt.Polygon
-import javax.imageio.ImageIO
-import qupath.lib.gui.commands.ProjectCommands
-import qupath.fx.dialogs.Dialogs
-import qupath.lib.gui.tools.GuiTools
-import qupath.lib.regions.RegionRequest
+// Split annotations
 
-// Parse provided args for polygonFile
-if (args.size() > 0)
-    polygonFile = args[0].toString()
-else
-    polygonFile = Dialogs.promptForFile(null)
+def className = args.length > 0 ? args[0] : "Anthracosis"
 
-if (polygonFile == null)
+def imageData = getCurrentImageData()
+if (imageData == null) {
+    println "No image data available!"
     return
-
-println "Parsing polygon coordinates from ${polygonFile} and adding polygon annotation for each image."
-
-// Parse all lines in polygonFile
-def polygonMap = [:]
-new File(polygonFile).eachLine { line, lineNumber ->
-    if (lineNumber > 1) {
-        def fields = line.split(/\t/)
-        if (fields.size() >= 3) {
-            def imagePath = fields[0].toString()
-            def polygonData = [
-                xcoords: fields[1].split(',').collect { it.toDouble() } as double[],
-                ycoords: fields[2].split(',').collect { it.toDouble() } as double[]
-            ]
-            polygonMap[imagePath] = polygonData
-        }
-    }
 }
 
-// Get the current project
-def project = getProject()
-def projectDir = project.getPath().toFile().getParentFile()
+selectObjectsByClassification(className)
+runPlugin('qupath.lib.plugins.objects.SplitAnnotationsPlugin', '{}')
 
-// Loop through all image entries in the project
-for (entry in project.getImageList()) {
-    def imageName = entry.getImageName()
-    def matchingKey = polygonMap.keySet().find { key ->
-        new File(key).getName().equalsIgnoreCase(new File(imageName).getName()) ||
-        key.toLowerCase().contains(imageName.toLowerCase())
-    }
-
-    if (matchingKey) {
-        def polygonData = polygonMap[matchingKey]
-        def imageData = entry.readImageData()
-        def hierarchy = imageData.getHierarchy()
-
-        // Create and save the annotation
-        def roi = ROIs.createPolygonROI(polygonData.xcoords, polygonData.ycoords, ImagePlane.getDefaultPlane())
-        def bounding_poly = PathObjects.createAnnotationObject(roi)
-        bounding_poly.setPathClass(getPathClass("BoundingPolygon"))
-        hierarchy.addObject(bounding_poly)
-        entry.saveImageData(imageData)
-
-        // Save downsampled image
-        def snapshotDir = new File(projectDir, "downsampled_snapshots")
-        snapshotDir.mkdirs()
-
-        try {
-            def server = imageData.getServer()
-            def request = RegionRequest.createInstance(
-                server.getPath(),
-                10,                  // downsample factor
-                0, 0,
-                server.getWidth(),
-                server.getHeight()
-            )
-            def outputPath = new File(snapshotDir, "${imageName}_downsampled.jpg").toString()
-            writeImageRegion(server, request, outputPath)
-            println "Downsampled image saved: ${outputPath}"
-        } catch (Exception e) {
-            println "Warning: Could not save downsampled image for ${imageName}: ${e.getMessage()}"
-        }
-    }
-}
-
-println "Done!"
+// Save the changes back to the project
+getProject().getEntry(imageData).saveImageData(imageData)
+println "${className} annotations split!"
