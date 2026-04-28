@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, include=FALSE}
 ### Loading Packages
 library(data.table); library(tidyr); library(ggplot2); library(ggpubr)
-library(dplyr); library(stringr); library(gtsummary); library(shiny)
+library(dplyr); library(stringr); library(shiny)
 
 # Resolve project path: prefer params, fallback to env var QPROJ_PATH, then cwd
 qproj <- NULL
