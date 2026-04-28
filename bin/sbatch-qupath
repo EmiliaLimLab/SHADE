@@ -97,7 +97,7 @@ if [ "$export_overlay" = true ]; then
   eval ${qupath_export_cmd}
 
   # Set Python interpreter (conda env with required packages)
-  PYTHON=/path/to/miniconda3/envs/anthracosis_quant/bin/python3
+  PYTHON=/path/to/miniconda3/envs/anthracosis_quant/bin/python
 
   #Run tiff_to_jpeg_process.py
   tiff_script_path="${ANTHRACOSIS_QUANT_DIR}/scripts/tiff_to_jpeg_process.py"
