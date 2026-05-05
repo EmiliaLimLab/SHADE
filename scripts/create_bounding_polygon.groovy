@@ -50,15 +50,30 @@ for (entry in project.getImageList()) {
 
     if (matchingKey) {
         def polygonData = polygonMap[matchingKey]
-        def imageData = entry.readImageData()
+        def imageData = getCurrentImageData()
         def hierarchy = imageData.getHierarchy()
 
         // Create and save the annotation
+        def boundingClass = getPathClass("BoundingPolygon") ?: PathClassFactory.getPathClass("BoundingPolygon")
         def roi = ROIs.createPolygonROI(polygonData.xcoords, polygonData.ycoords, ImagePlane.getDefaultPlane())
         def bounding_poly = PathObjects.createAnnotationObject(roi)
-        bounding_poly.setPathClass(getPathClass("BoundingPolygon"))
+        bounding_poly.setPathClass(getPathClass(boundingClass))
+        bounding_poly.setName("BoundingPolygon")
         hierarchy.addObject(bounding_poly)
+
+        // Fire hierarchy update so the annotation is fully registered before saving
+        hierarchy.fireHierarchyChangedEvent(null)
+ 
         entry.saveImageData(imageData)
+        project.syncChanges()
+        
+        println "Added BoundingPolygon for ${imageName}; total annotations: ${hierarchy.getAnnotationObjects().size()}"
+ 
+        // Verify the annotation was saved correctly
+        def verifyData = entry.readImageData()
+        def savedCount = verifyData.getHierarchy().getAnnotationObjects().size()
+        def savedNames = verifyData.getHierarchy().getAnnotationObjects().collect { it.getName() }
+        println "  Verification - saved annotations: ${savedCount}, names: ${savedNames}"
 
         // Save downsampled image
         def snapshotDir = new File(projectDir, "downsampled_snapshots")
