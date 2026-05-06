@@ -7,6 +7,14 @@ else
 if (classifierDir == null)
     return
 
+// Diagnostic: list all annotations and their classes
+def imageData = getCurrentImageData()
+def hierarchy = imageData.getHierarchy()
+println "Total annotations in image: ${hierarchy.getAnnotationObjects().size()}"
+hierarchy.getAnnotationObjects().each { obj ->
+    println "  - Class: ${obj.getPathClass()}, Type: ${obj.getClass().getSimpleName()}"
+}
+
 def tissueClassifier = classifierDir + File.separator + "tissue_detection_annotation.json"
 def darkPixelClassifier = classifierDir + File.separator + "max_hires_t75.json"
 def heStainDeconvolution = classifierDir + File.separator + "residual_hires_t0.19.json"
