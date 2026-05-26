@@ -28,6 +28,6 @@ while IFS= read -r -d '' file; do
 	mkdir -p ${file%.*}
 	cd ${file%.*}
 	ln -sf ${file}
-	sbatch ${sbatch_qupath} -d ${file%.*} -b ${bounding_poly_tsv} -e
+	${sbatch_qupath} -d ${file%.*} -b ${bounding_poly_tsv} -e # To use with SLURM system, add sbatch to the beginning of this line
 	cd ../
 done < <( eval ${find_files} )
