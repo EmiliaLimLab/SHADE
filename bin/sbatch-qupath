@@ -32,7 +32,7 @@ QUPATH_DIR=/path/to/local/QuPath/installation
 ANTHRACOSIS_QUANT_DIR=/path/to/SHADE/folder
 
 # Define executables and scripts
-QuPath=${QUPATH_DIR} #/bin/QuPath
+QuPath=${QUPATH_DIR} # Add /bin/QuPath to the end of this line if running on SLURM or cluster system
 create_project=${ANTHRACOSIS_QUANT_DIR}/scripts/create_project.groovy
 create_bounding_polygon_script=${ANTHRACOSIS_QUANT_DIR}/scripts/create_bounding_polygon.groovy
 tfm_base_script=${ANTHRACOSIS_QUANT_DIR}/scripts/tfm_script.groovy
@@ -105,13 +105,14 @@ if [ "$export_overlay" = true ]; then
     "${PYTHON}" "${tiff_script_path}" \
 	-i "${qproj_path}" --no-recursive || echo "tiff_to_jpeg_process.py failed" >&2
   else
-	echo "Warning: tiff_to_jpeg_process.py not found at ${tiff_script_path}, skipping TIFF -> JPEG conversion" >&2
+  echo "Warning: tiff_to_jpeg_process.py not found at ${tiff_script_path}, skipping TIFF -> JPEG conversion" >&2
   fi
 fi
 
 # Split anthracosis annotations into individual regions
 ${QuPath} script \
   -p ${qproj_path}/project.qpproj \
+  -a ${qproj_path}/classifiers/pixel_classifiers \
   -a "${export_class:-Anthracosis}" \
   -s ${split_anth_anno}
 
