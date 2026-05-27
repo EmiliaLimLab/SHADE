@@ -97,33 +97,6 @@ anth_histo <- ggplot(anth_anno %>%
 plot(anth_histo)
 ```
 
-```{r}
-##SPECK SHADE Score
-speck =  anth_anno %>%
-  filter(Area.µm.2 <= 10) %>%
-  summarise(speck_area = sum(Area.µm.2))
-
-speck_ss = speck %>%
-  mutate(speck_score = (speck / tissue_area$Area.µm.2) *100)
-
-knitr::kable(speck_ss,
-             caption = "SPECK SHADE Score")
-```
-
-```{r}
-##CONF SHADE Score
-conf =  anth_anno %>%
-  filter(Area.µm.2 > 10) %>%
-  summarise(conf_area = sum(Area.µm.2))
-
-conf_ss = conf %>%
-  mutate(conf_score = (conf / tissue_area$Area.µm.2) *100)
-
-knitr::kable(conf_ss,
-             caption = "CONFLUENT SHADE Score")
-
-```
-
 ## Summary of anthracotic annotations
 ```{r}
 summary(anth_anno)
