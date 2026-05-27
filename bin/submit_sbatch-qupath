@@ -11,7 +11,7 @@ bounding_poly_tsv=$( readlink -f $2 )
 file_list=$3
 
 # Installation directory
-ANTHRACOSIS_QUANT_DIR=/Users/lucas/Desktop/SHADE/SHADE_test
+ANTHRACOSIS_QUANT_DIR=/path/to/SHADE/folder
 
 # Define executables
 sbatch_qupath=${ANTHRACOSIS_QUANT_DIR}/bin/sbatch-qupath
@@ -28,6 +28,6 @@ while IFS= read -r -d '' file; do
 	mkdir -p ${file%.*}
 	cd ${file%.*}
 	ln -sf ${file}
-	${sbatch_qupath} -d ${file%.*} -b ${bounding_poly_tsv} -e
+	${sbatch_qupath} -d ${file%.*} -b ${bounding_poly_tsv} -e # To use with SLURM system, add sbatch to the beginning of this line
 	cd ../
 done < <( eval ${find_files} )
