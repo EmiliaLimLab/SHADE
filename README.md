@@ -87,6 +87,12 @@ Several annotation types can be provided as input. This will export all specifie
 sbatch sbatch-qupath -d ${img_path} -b ${polyROI_coords_tsv} -e anthracosis,tissue
 ```
 
+If you would like to run SHADE without using bounding polygon from the preprocesing step, simply omit `-b ${polyROI_coords_tsv}` as you run the `sbatch-qupath` script as follows:
+
+```bash
+sbatch sbatch-qupath -d ${img_path} -e
+```
+
 **Note:** Based on our experience, OME.TIFF files tend to be >10GB in size with file size scaling with amount of anthracosis.
 
 It is recommended that a helper script be used to launch the quantification SLURM script separately for each slide image. Refer to `tests/` for an example.
@@ -95,13 +101,14 @@ It is recommended that a helper script be used to launch the quantification SLUR
 
 Main output files can be found in the `QuPathProject` directory:
 * `{sample}_raw.csv`: CSV file with measurements for each component
-* `{sample}_anth_anno.csv`: CSV file containing measurements for individual regions of detected anthracosis 
+* `{sample}_anth_anno.csv`: CSV file containing measurements for individual regions of detected anthracosis
 * `{sample}.geojson`: GeoJSON file containing x,y coordinates for each component
   * If QuPath GUI is installed, the GeoJSON files can be imported, enabling interactive visualization of each component overlayed on the slide image
 * `{sample}.{anthracosis/tissue/positive/other}-annotated.ome.tiff` (optional): Static OME.TIFF file with anthracosis, tissue, positive and/or other annotations overlayed on the slide image
   * Only output if `-e` option is provided
 * `{sample}.{anthracosis/tissue/positive/other}-annotated.ome.jpg`: Downsized version of the OME.TIFF file in a JPG format as the OME.TIFF files tend to be quite large (>8GB)
 * `{sample}.{anthracosis/tissue/positive/other}-annotated.ome_enhanced.png`: Downsized version of the OME.TIFF file in a PNG format. This PNG also masks the detected anthracotic regions in red while other regions are semi-transparent
+* `SHADE_output.html`: HTML file containing summary results of SHADE including the SHADE score, distribution of anthracotic annotations and their summary statistics.
 
  ## Test demo
 
