@@ -1,6 +1,17 @@
 # SHADE - Slide-based methods for High Throughput Anthracosis Detection & Estimation
 
-This repository includes scripts to perform automatic anthracotic pigment quantification from whole slide images using pixel classifiers.
+This repository includes scripts to perform automatic anthracotic (black carbon) pigment quantification from whole slide images (WSIs) using pixel classifiers in [Qupath](https://qupath.github.io/).
+It is designed for high-throughput pathology workflows running on SLURM-based HPC clusters.
+
+## Overview
+
+Anthracotic pigment appears dark on H&E-stained slides — the same colour as many common slide artifacts (dust, ink marks, edge effects). Without masking, these artifacts inflate pigment measurements. SHADE addresses this by first drawing a bounding polygon around the true tissue region, then running QuPath pixel classifiers only within that boundary.
+
+The two main pipeline steps (found in `bin/`) are:
+
+1. **Preprocessing** (`preprocess_he_otsu.py`) — detects tissue boundaries using an Otsu-thresholding approach and outputs bounding polygon coordinates.
+   **Note:** this script can only be run on slide images in SVS or NDPI format
+2. **Quantification** (`sbatch-qupath`) — submits a SLURM job that calls QuPath to classify and measure anthracotic pixels within the bounding region.
 
 ## Installation
 
@@ -28,15 +39,7 @@ conda env create --file=environment.yml
   * ffmpeg (tested with v7.1.1)
 
 
-## Running anthracosis quantification
-
-### Description of scripts
-
-There are two main scripts included in this repo, both of which can be found in `bin/`:
-
-* `preprocess_he_otsu.py`: outputs bounding polygon coordinates around tissue region
-  * **Note:** this script can only be run on slide images in SVS or NDPI format
-* `sbatch-qupath`: SLURM script for performing anthracotic pigment quantification
+## Applying SHADE
 
 ### Step-by-step guide
 
