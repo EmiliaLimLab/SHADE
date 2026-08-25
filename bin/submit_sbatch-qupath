@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -lt 2 ]; then
+if [ $# -lt 1 ]; then
         echo "Usage: $(basename $0) <directory with images> <bounding polygon coords> <file with specific files>"
         exit 1
 fi
@@ -28,6 +28,6 @@ while IFS= read -r -d '' file; do
 	mkdir -p ${file%.*}
 	cd ${file%.*}
 	ln -sf ${file}
-	${sbatch_qupath} -d ${file%.*} -b ${bounding_poly_tsv} -e # To use with SLURM system, add sbatch to the beginning of this line
+	${sbatch_qupath} -d ${file%.*} -b ${bounding_poly_tsv} -e # To run without using the bounding box, remove "-b ${bounding_poly_tsv}" from this line
 	cd ../
 done < <( eval ${find_files} )
