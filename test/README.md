@@ -25,6 +25,11 @@ As there is only one image in this test directory, we don't need to specify `fil
 ```bash
 ./submit_sbatch-qupath . polyROI_coordinates.tsv
 ```
+Optionally, if you want to quantify the anthracotic pigments without the use of the bounding box, you can remove this section `-b ${bounding_poly_tsv}` on line 32 of the `submit_sbatch-qupath` script. Then you can run the script as follows:
+
+```bash
+./submit_sbatch-qupath .
+```
 
 That's it! The output files should match those found in `expected_output/`.
 
