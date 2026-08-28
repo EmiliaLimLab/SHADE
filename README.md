@@ -1,7 +1,7 @@
 # SHADE - Slide-based methods for High Throughput Anthracosis Detection & Estimation
 
 This repository includes scripts to perform automatic anthracotic (black carbon) pigment quantification from whole slide images (WSIs) using pixel classifiers in [Qupath](https://qupath.github.io/).
-It is designed for high-throughput pathology workflows running on SLURM-based HPC clusters.
+It is designed for high-throughput pathology workflows running on local computers or SLURM-based HPC clusters.
 
 ## Overview
 
@@ -11,7 +11,9 @@ The two main pipeline steps (found in `bin/`) are:
 
 1. **Preprocessing** (`preprocess_he_otsu.py`) — detects tissue boundaries using an Otsu-thresholding approach and outputs bounding polygon coordinates.
    **Note:** this script can only be run on slide images in SVS or NDPI format
-2. **Quantification** (`sbatch-qupath`) — submits a SLURM job that calls QuPath to classify and measure anthracotic pixels within the bounding region.
+2. **Quantification** (`sbatch-qupath`) — calls QuPath to classify and measure anthracotic pixels within the bounding region.
+
+To run the quantification step of SHADE on SLURM-based clusters, use the `slurm_xxxx` scripts in `bin/`.
 
 ## Installation
 
@@ -95,7 +97,7 @@ sbatch sbatch-qupath -d ${img_path} -e
 
 **Note:** Based on our experience, OME.TIFF files tend to be >10GB in size with file size scaling with amount of anthracosis.
 
-It is recommended that a helper script be used to launch the quantification SLURM script separately for each slide image. Refer to `tests/` for an example.
+It is recommended that a helper script (`submit_sbatch-qupath`) be used to launch the quantification SLURM script separately for each slide image. Refer to `tests/` for an example.
 
 ## Output files
 
