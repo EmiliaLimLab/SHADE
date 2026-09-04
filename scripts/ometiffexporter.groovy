@@ -90,12 +90,16 @@ def overlayAnnotations(ImageData imageData, String outputPath, List<PathObject> 
         .build()
 
     // Export
+    def outputDownsample = 1
+    def pyramidscaling = 2
+    
     def imageWriter = new OMEPyramidWriter.Builder(renderedServer)
         .tileSize(256)
         .channelsInterleaved()  // interleave, don't store channels in separate planes
         .parallelize(Runtime.getRuntime().availableProcessors())  // use parallel processing, if available
         .pixelType('uint8')
         .losslessCompression()
+        .scaledDownsampling(outputDownsample, pyramidscaling)
         .build()
         .writePyramid(outputPath)
 }
