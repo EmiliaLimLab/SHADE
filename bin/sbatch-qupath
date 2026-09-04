@@ -124,6 +124,6 @@ ${QuPath} script \
 
 #Render SHADE R Markdown
 export QPROJ_PATH="${qproj_path}"
-Rscript -e "rmarkdown::render('${ANTHRACOSIS_QUANT_DIR}scripts/SHADE_output.Rmd', \ 
+Rscript -e 'rmarkdown::render('${ANTHRACOSIS_QUANT_DIR}/scripts/SHADE_output.Rmd', \ 
 params = list(qproj_path = Sys.getenv('QPROJ_PATH')), \
-output_dir = Sys.getenv('QPROJ_PATH'), envir = new.env())"
+output_dir = Sys.getenv('QPROJ_PATH'), envir = new.env())'
