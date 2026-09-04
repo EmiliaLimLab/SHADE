@@ -65,7 +65,7 @@ python polyROI_geojson2tsv.py -i /path/to/tab-delimited/samplesheet
 ```
 The resulting output will be a `polyROI_coordinates.tsv` similar to the `preprocess_he_otsu.py` output. **Note:** Ensure that the geometry type in the geoJSON file is **Polygon**, not **Multipolygon**, as this script does not work with multipolygons.
 
-Anthracotic pigment quantification can then be performed using QuPath. To do this, first specify the path to your QuPath and Anthracosis quantification installations (`QUPATH_DIR` and `ANTHRACOSIS_QUANT_DIR`, respectively) in the `sbatch-qupath` script, then run as follows:
+Anthracotic pigment quantification can then be performed using QuPath. To do this, first specify the path to your QuPath and Anthracosis quantification installations (`QUPATH_DIR` and `ANTHRACOSIS_QUANT_DIR`, respectively) in the `sbatch-qupath` script, add the path to the Python interpreter on line 100 of the `sbatch-qupath` script (`path/to/miniconda3/envs/anthracosis_quant/bin` then attach `/python` on the same line) and then run as follows:
 
 ```bash
 sbatch sbatch-qupath -d ${img_path} -b ${polyROI_coords_tsv}
