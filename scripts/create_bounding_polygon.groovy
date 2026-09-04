@@ -57,7 +57,7 @@ for (entry in project.getImageList()) {
         def boundingClass = getPathClass("BoundingPolygon") ?: PathClassFactory.getPathClass("BoundingPolygon")
         def roi = ROIs.createPolygonROI(polygonData.xcoords, polygonData.ycoords, ImagePlane.getDefaultPlane())
         def bounding_poly = PathObjects.createAnnotationObject(roi)
-        bounding_poly.setPathClass(getPathClass(boundingClass))
+        bounding_poly.setPathClass(boundingClass)
         bounding_poly.setName("BoundingPolygon")
         hierarchy.addObject(bounding_poly)
 
